@@ -3,7 +3,7 @@ package com.uriegas.yai;
 /**
  * Representation of a Token
  */
-class Token {
+public class Token {
     final TokenType type;
     final String lexeme;
     final Object literal;
