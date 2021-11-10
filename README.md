@@ -1,4 +1,7 @@
-# YAI-Interpreter
+[![Run on Repl.it](https://repl.it/badge/github/Uriegas/YAI-Interpreter)](https://repl.it/@Uriegas/YAI-Interpreter)
+YAI-Interpreter
+==================
+
 A fork from the incredible [Lox interpreter](https://github.com/munificent/craftinginterpreters/tree/master/java/com/craftinginterpreters/lox) by [Bob Nystrom](https://github.com/munificent).  
 
 ## Grammar  
