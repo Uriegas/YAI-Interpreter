@@ -15,4 +15,11 @@ public class Environment {
         }
         throw new RuntimeException("Variable " + name.lexeme + " not found");
     }
+
+    public void assign(Token name, Object value) {
+        if(values.containsKey(name.lexeme))
+            values.put(name.lexeme, value);
+        else //Variable not found
+            throw new RuntimeException("Variable " + name.lexeme + " not found");
+    }
 }
