@@ -6,7 +6,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public class Yai{
-    // private static final Interpreter interpreter = new Interpreter();
+    private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
 
@@ -64,7 +64,8 @@ public class Yai{
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
         if (hadError) return;
-        System.out.println(new ASTPrinter().print(expression));
+        // System.out.println(new ASTPrinter().print(expression));
+        interpreter.interpret(expression);
     }
 
     /**
@@ -81,6 +82,11 @@ public class Yai{
             report(token.line, " at end", message);
         else
             report(token.line, " at '" + token.lexeme + "'", message);
+    }
+
+    static void runtimeError(RuntimeError error) {
+        System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
     }
 
     /**
