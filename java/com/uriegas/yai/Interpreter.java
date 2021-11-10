@@ -1,16 +1,32 @@
 package com.uriegas.yai;
 
+import java.util.*;
 import static com.uriegas.yai.TokenType.*;
 
-public class Interpreter implements Expr.Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-    void interpret(Expr expression) { 
+    void interpret(List<Stmt> statements) { 
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            // Object value = evaluate(expression);
+            // System.out.println(stringify(value));
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
         } catch (RuntimeError error) {
-        Yai.runtimeError(error);
+            Yai.runtimeError(error);
         }
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        System.out.println(stringify(evaluate(stmt.expression)));
+        return null;
     }
 
     @Override
@@ -68,12 +84,18 @@ public class Interpreter implements Expr.Visitor<Object> {
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
     }
+
     @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
         return evaluate(expr.expression);
     }
+
     private Object evaluate(Expr expr) {
         return expr.accept(this);
+    }
+
+    private void execute(Stmt stmt) {
+        stmt.accept(this);
     }
 
     /**
@@ -125,7 +147,7 @@ public class Interpreter implements Expr.Visitor<Object> {
      * @return string representation of object
      */
     private String stringify(Object object) {
-        if (object == null) return "nil";
+        if (object == null) return "null";
         if (object instanceof Double) {
             String text = object.toString();
             if (text.endsWith(".0"))

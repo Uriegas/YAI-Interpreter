@@ -62,10 +62,11 @@ public class Yai{
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scan();
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        // Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
         if (hadError) return;
         // System.out.println(new ASTPrinter().print(expression));
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
     }
 
     /**

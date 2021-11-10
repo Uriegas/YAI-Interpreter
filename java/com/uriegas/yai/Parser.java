@@ -21,74 +21,42 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
-        try{
-            return expression();
-        }catch(ParseError e){
-            return null;
-        }
-    }
-
     /**
-     * Check if the current token is of the given type(s).
-     * @param types
-     * @return
+     * Parses the tokens and returns the root node.
+     * @return a list of statements.
      */
-    private boolean match(TokenType... types) {
-        for (TokenType type : types) {
-            if (check(type)) {
-                advance();
-                return true;
-            }
-        }
-        return false;
+    public List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd())
+            statements.add(statement());
+        return statements; 
     }
-
-    /**
-     * Check if the current token is of the given type.
-     * @param type
-     * @return
-     */
-    private boolean check(TokenType type) {
-        if (isAtEnd()) return false;
-        return peek().type == type;
-    }
-
-    /**
-     * Check if the current token is of the given type and advance.
-     * @param type
-     * @return
-     */
-    private Token advance() {
-        if (!isAtEnd()) current++;
-        return previous();
-    }
-
-    /**
-     * Check if we are out of tokens.
-     * @return true if we are at the end of the tokens.
-     */
-    private boolean isAtEnd() {
-        return peek().type == EOF;
-    }
-
-    /**
-     * Get the current token.
-     * @return
-     */
-    private Token peek() {
-        return tokens.get(current);
-    }
-
-    /**
-     * Get the previous token.
-     * @return the previous token.
-     */
-    private Token previous() {
-        return tokens.get(current - 1);
-    }
+    // Expr parse() {
+    //     try{
+    //         return expression();
+    //     }catch(ParseError e){
+    //         return null;
+    //     }
+    // }
 
     // ==> Production Rules
+    private Stmt statement() { // stmt -> exprStmnt | printStmnt
+        if (match(PRINT)) return printStatement();
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() { // printStmt -> "print" expression ";"
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() { // exprStmnt -> expression ";"
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after expression.");
+        return new Stmt.Expression(expr);
+    }
+
     private Expr expression() { // expression -> equality
         return equality();
     }
@@ -156,6 +124,7 @@ public class Parser {
     }
     // <== Production Rules
 
+    // ==> Helper Methods
     /**
      * Check if the next token is of the expected type and return it, otherwise throw an error.
      * @param type
@@ -192,4 +161,64 @@ public class Parser {
             advance();
         }
     }
+
+    /**
+     * Check if the current token is of the given type(s).
+     * @param types
+     * @return
+     */
+    private boolean match(TokenType... types) {
+        for (TokenType type : types) {
+            if (check(type)) {
+                advance();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the current token is of the given type.
+     * @param type
+     * @return
+     */
+    private boolean check(TokenType type) {
+        if (isAtEnd()) return false;
+        return peek().type == type;
+    }
+
+    /**
+     * Check if the current token is of the given type and advance.
+     * @param type
+     * @return
+     */
+    private Token advance() {
+        if (!isAtEnd()) current++;
+        return previous();
+    }
+
+    /**
+     * Check if we are out of tokens.
+     * @return true if we are at the end of the tokens.
+     */
+    private boolean isAtEnd() {
+        return peek().type == EOF;
+    }
+
+    /**
+     * Get the current token.
+     * @return
+     */
+    private Token peek() {
+        return tokens.get(current);
+    }
+
+    /**
+     * Get the previous token.
+     * @return the previous token.
+     */
+    private Token previous() {
+        return tokens.get(current - 1);
+    }
+    // <== Helper Methods
 }
