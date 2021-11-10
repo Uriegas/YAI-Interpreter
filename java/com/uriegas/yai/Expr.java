@@ -17,7 +17,7 @@ abstract class Expr {
         // R visitLogicalExpr(Logical expr);
         // R visitSetExpr(Set expr);
         R visitUnaryExpr(Unary expr);
-        // R visitVariableExpr(Variable expr);
+        R visitVariableExpr(Variable expr);
     }
     
     // ==> Expression classes
@@ -142,16 +142,16 @@ abstract class Expr {
         }
     }
 
-    // static class Variable extends Expr {
-    //     final Token name;
-    //     Variable(Token name) {
-    //         this.name = name;
-    //     }
-    //     @Override
-    //     <R> R accept(Visitor<R> visitor) {
-    //         return visitor.visitVariableExpr(this);
-    //     }
-    // }
+    static class Variable extends Expr {
+        final Token name;
+        Variable(Token name) {
+            this.name = name;
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVariableExpr(this);
+        }
+    }
     // <== Expression classes
 
     abstract <R> R accept(Visitor<R> visitor);

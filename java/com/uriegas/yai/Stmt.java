@@ -13,7 +13,7 @@ abstract class Stmt {
         // R visitIfStmt(If stmt);
         R visitPrintStmt(Print stmt);
         // R visitReturnStmt(Return stmt);
-        // R visitVarStmt(Var stmt);
+        R visitVarStmt(Var stmt);
         // R visitWhileStmt(While stmt);
     }
 
@@ -94,18 +94,18 @@ abstract class Stmt {
     //     }
     // }
     
-    // static class Var extends Stmt {
-    //     final Token name;
-    //     final Expr initializer;
-    //     Var(Token name, Expr initializer) {
-    //         this.name = name;
-    //         this.initializer = initializer;
-    //     }
-    //     @Override
-    //     <R> R accept(Visitor<R> visitor) {
-    //         return visitor.visitVarStmt(this);
-    //     }
-    // }
+    static class Var extends Stmt {
+        final Token name;
+        final Expr initializer;
+        Var(Token name, Expr initializer) {
+            this.name = name;
+            this.initializer = initializer;
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVarStmt(this);
+        }
+    }
     
     // static class While extends Stmt {
     //     final Expr condition;

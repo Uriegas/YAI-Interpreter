@@ -28,7 +28,7 @@ public class Parser {
     public List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
         while (!isAtEnd())
-            statements.add(statement());
+            statements.add(declaration());
         return statements; 
     }
     // Expr parse() {
@@ -40,6 +40,33 @@ public class Parser {
     // }
 
     // ==> Production Rules
+    private Stmt declaration() { // declaration -> varDecl
+        try {
+            if (match(VAR))
+                return varDeclaration();
+            // } else if (match(FUN)) {
+            //     return funDeclaration();
+            // } else {
+            //     return statement();
+            // }
+            return statement();
+        } catch (ParseError e) {
+            synchronize();
+            return null;
+        }
+    }
+
+    private Stmt varDeclaration() { // varDecl -> "var" IDENTIFIER ("=" expression)? ";"
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+        // consume(EQUAL, "Expect '=' after variable name.");
+        Expr initializer = null;
+        if(match(EQUAL)){
+            initializer = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+    }
+
     private Stmt statement() { // stmt -> exprStmnt | printStmnt
         if (match(PRINT)) return printStatement();
         return expressionStatement();
@@ -110,12 +137,13 @@ public class Parser {
         return primary();
     }
 
-    private Expr primary() { // primary -> NUMBER | STRING | "false" | "true" | "null" | "(" expression ")"
+    private Expr primary() { // primary -> NUMBER | STRING | IDENTIFIER | "false" | "true" | "null" | "(" expression ")"
+        if (match(NUMBER, STRING)) return new Expr.Literal(previous().literal);
+        if (match(IDENTIFIER)) return new Expr.Variable(previous());
         if (match(FALSE)) return new Expr.Literal(false);
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NULL)) return new Expr.Literal(null);
-        if (match(NUMBER, STRING)) return new Expr.Literal(previous().literal);
-        if (match(LEFT_PAREN)) {
+        if (match(LEFT_PAREN)) {//"(" Expression ")"
             Expr expr = expression();
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);

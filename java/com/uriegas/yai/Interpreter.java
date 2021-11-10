@@ -4,11 +4,10 @@ import java.util.*;
 import static com.uriegas.yai.TokenType.*;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+    private Environment environment = new Environment(); //Global environment
 
     void interpret(List<Stmt> statements) { 
         try {
-            // Object value = evaluate(expression);
-            // System.out.println(stringify(value));
             for (Stmt statement : statements) {
                 execute(statement);
             }
@@ -27,6 +26,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitPrintStmt(Stmt.Print stmt) {
         System.out.println(stringify(evaluate(stmt.expression)));
         return null;
+    }
+
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null)
+            value = evaluate(stmt.initializer);
+
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitVariableExpr(Expr.Variable expr) {
+        return environment.get(expr.name);
     }
 
     @Override
