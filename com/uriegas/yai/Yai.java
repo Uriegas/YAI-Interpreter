@@ -45,7 +45,18 @@ public class Yai{
     private static void runPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
-
+        System.out.println("==YET ANOTHER INTERPTER==");
+        String yai;
+        yai =
+"**      **     **      **" + "  Usage:" + "\n" +
+" //**  **     ****    /**" + "\t var x = 10;" + "\n" +
+"  //****     **//**   /**" + "\t for(var i = 0; i < 10; i = i+1){print (i+x);}" + "\n" +
+"   //**     **  //**  /**" + "\t if(nill == nill) print \"OMG\" + \"!!\";" + "\n" +
+"    /**    ********** /**" + "\t def add(x, y){return x + y;}" + "\n" +
+"    /**   /**//////** /**" + "\t print add(x, 3);" + "\n" +
+"    /**  /**      /***/**" + "\t print \"Pura UPV Compa\";" + "\n" +
+"    //   //      ///  // ";
+        System.out.println(yai);
         while(true) { 
             System.out.print("> ");
             String line = reader.readLine();
