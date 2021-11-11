@@ -67,10 +67,22 @@ public class Parser {
         return new Stmt.Var(name, initializer);
     }
 
-    private Stmt statement() { // stmt -> printStmnt | block | exprStmnt
+    private Stmt statement() { // stmt -> printStmnt | ifStmt | block | exprStmnt
         if (match(PRINT)) return printStatement();
+        if(match(IF)) return ifStatement();
         if (match(LEFT_BRACE)) return block();
         return expressionStatement();
+    }
+    
+    private Stmt ifStatement() { // ifStmnt -> "if" "(" expression ")" stmt ("else" stmt)?
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+        if (match(ELSE))
+            elseBranch = statement();
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
     private Stmt printStatement() { // printStmt -> "print" expression ";"
