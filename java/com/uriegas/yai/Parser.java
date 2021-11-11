@@ -31,13 +31,6 @@ public class Parser {
             statements.add(declaration());
         return statements; 
     }
-    // Expr parse() {
-    //     try{
-    //         return expression();
-    //     }catch(ParseError e){
-    //         return null;
-    //     }
-    // }
 
     // ==> Production Rules
     private Stmt declaration() { // declaration -> varDecl | funcDecl | statement
@@ -81,11 +74,12 @@ public class Parser {
         return new Stmt.Function(name, parameters, body);
     }
 
-    private Stmt statement() { // stmt -> printStmnt | ifStmt | block | exprStmnt | whileStmnt | forStmnt
+    private Stmt statement() { // stmt -> printStmnt | ifStmt | block | exprStmnt | whileStmnt | forStmnt | returnStmnt
         if (match(PRINT)) return printStatement();
         if(match(IF)) return ifStatement();
         if(match(WHILE)) return whileStatement();
         if(match(FOR)) return forStatement();
+        if(match(RETURN)) return returnStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
         return expressionStatement();
     }
@@ -161,6 +155,15 @@ public class Parser {
         Expr value = expression();
         consume(SEMICOLON, "Expect ';' after value.");
         return new Stmt.Print(value);
+    }
+
+    private Stmt returnStatement() { // returnStmnt -> "return" expression? ";"
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON))
+            value = expression();
+        consume(SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     private List<Stmt> block() { // block -> "{" declaration* "}"

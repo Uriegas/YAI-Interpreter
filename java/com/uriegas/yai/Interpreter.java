@@ -4,6 +4,7 @@ import java.util.*;
 import static com.uriegas.yai.TokenType.*;
 
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+    final Environment globals = new Environment();
     private Environment environment = new Environment(); //Global environment
 
     void interpret(List<Stmt> statements) { 
@@ -26,6 +27,14 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitPrintStmt(Stmt.Print stmt) {
         System.out.println(stringify(evaluate(stmt.expression)));
         return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt) {
+        Object value = null;
+        if(stmt.value != null)
+            value = evaluate(stmt.value);
+        throw new Return(value);
     }
 
     @Override
