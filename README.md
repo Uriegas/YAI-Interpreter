@@ -4,6 +4,19 @@ YAI-Interpreter
 
 A fork from the incredible [Lox interpreter](https://github.com/munificent/craftinginterpreters/tree/master/java/com/craftinginterpreters/lox) by [Bob Nystrom](https://github.com/munificent).  
 
+## Turing Complete  
+Because this programming language implements the basic parts of a complete Turing machine:
+* arithmetic
+* control flow
+* memory allocation
+
+---
+**NOTE**
+
+For control flow a programming language only needs while loops and if statements, even though other kind of loops are commonly implemented
+
+---
+
 ## Grammar  
 The following is the grammar for the YAI interpreter in Extended Backus-Naur form ([EBNF](https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form)) notation:  
 ```md
@@ -11,23 +24,24 @@ The following is the grammar for the YAI interpreter in Extended Backus-Naur for
 program     = declaration* EOF
 declaration = funcDecl | varDecl | statement
 funcDecl    = "def" function
-varDecl     = "yai" ID ("=" expression)? ";"
+varDecl     = "var" IDENTIFIER ("=" expression)? ";"
 
 #Statements
-statement   = exprStmnt | forStmnt | ifStmnt | returnStmnt | whileStmnt | block
+statement   = printStmnt | exprStmnt | forStmnt | ifStmnt | returnStmnt | whileStmnt | block
+printStmnt  = "print" expression ";"
 exprStmnt   = expression ";"
 forStmnt    = "for" "(" (varDecl | exprStmnt | ";")
                         expression? ";"
                         expression? ")"
                     statement
 ifStmnt     = "if" "(" expression ")" statement
-returnStmnt = "return" expression?
+returnStmnt = "return" expression? ";"
 whileStmnt  = "while" "(" expression ")" statement
 block       = "{" declaration* "}"
 
 #Expressions
 expression  = assignment
-assignment  = ( call "." )? IDENTIFIER "=" assignment | logic_or
+assignment  = IDENTIFIER "=" assignment | logic_or
 logic_or    = logic_and ( "or" logic_and )*
 logic_and   = equality ( "and" equality )*
 equality    = comparison ( ( "!=" | "==" ) comparison )*
@@ -51,3 +65,6 @@ ALPHA       = "a" ... "z" | "A" ... "Z" | "_"
 DIGIT       = "0" ... "9"
 CHAR        = UNICODE chars except "\""
 ```
+
+## TODO  
+Problem with recursive function call stack
