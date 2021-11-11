@@ -40,15 +40,12 @@ public class Parser {
     // }
 
     // ==> Production Rules
-    private Stmt declaration() { // declaration -> varDecl
+    private Stmt declaration() { // declaration -> varDecl | funcDecl | statement
         try {
             if (match(VAR))
                 return varDeclaration();
-            // } else if (match(FUN)) {
-            //     return funDeclaration();
-            // } else {
-            //     return statement();
-            // }
+            if (match(FUN))
+                return funDeclaration();
             return statement();
         } catch (ParseError e) {
             synchronize();
@@ -67,12 +64,29 @@ public class Parser {
         return new Stmt.Var(name, initializer);
     }
 
+    private Stmt.Function funDeclaration() { // funcDecl -> "def" IDENTIFIER "(" parameters? ")" block
+        Token name = consume(IDENTIFIER, "Expect function name.");
+        consume(LEFT_PAREN, "Expect '(' after function name.");
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 8)
+                    error(peek(), "Cannot have more than 8 parameters.");
+                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+        consume(LEFT_BRACE, "Expect '{' before function body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(name, parameters, body);
+    }
+
     private Stmt statement() { // stmt -> printStmnt | ifStmt | block | exprStmnt | whileStmnt | forStmnt
         if (match(PRINT)) return printStatement();
         if(match(IF)) return ifStatement();
         if(match(WHILE)) return whileStatement();
         if(match(FOR)) return forStatement();
-        if (match(LEFT_BRACE)) return block();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
         return expressionStatement();
     }
 
@@ -149,12 +163,12 @@ public class Parser {
         return new Stmt.Print(value);
     }
 
-    private Stmt block() { // block -> "{" declaration* "}"
+    private List<Stmt> block() { // block -> "{" declaration* "}"
         List<Stmt> statements = new ArrayList<>();
         while (!check(RIGHT_BRACE) && !isAtEnd())
             statements.add(declaration());
         consume(RIGHT_BRACE, "Expect '}' after block.");
-        return new Stmt.Block(statements);
+        return statements;
     }
 
     private Stmt expressionStatement() { // exprStmnt -> expression ";"
