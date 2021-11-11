@@ -67,11 +67,69 @@ public class Parser {
         return new Stmt.Var(name, initializer);
     }
 
-    private Stmt statement() { // stmt -> printStmnt | ifStmt | block | exprStmnt
+    private Stmt statement() { // stmt -> printStmnt | ifStmt | block | exprStmnt | whileStmnt | forStmnt
         if (match(PRINT)) return printStatement();
         if(match(IF)) return ifStatement();
+        if(match(WHILE)) return whileStatement();
+        if(match(FOR)) return forStatement();
         if (match(LEFT_BRACE)) return block();
         return expressionStatement();
+    }
+
+    private Stmt forStatement() { // forStmnt -> "for" "(" (varDecl | exprStmt | ";") ";" expression? ";" expression? ")" stmt
+        // Note: For for statements we don't create a new node type neither semantic analysis
+        //       we only descompose it (syntactically) into an initializer, condition and incrementor.
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+        
+        // ==> Initializer
+        Stmt initializer;
+        if(match(SEMICOLON)){
+            initializer = null;
+        }else if(match(VAR)){
+            initializer = varDeclaration();
+        }else{
+            initializer = expressionStatement();
+        }
+        // <== Initializer
+
+        // ==> Condition
+        Expr condition = null;
+        if(!check(SEMICOLON)){
+            condition = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+        // <== Condition
+
+        // ==> Incrementor
+        Expr incrementor = null;
+        if(!check(RIGHT_PAREN)){
+            incrementor = expression();
+        }
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+        // <== Incrementor
+        Stmt body = statement();
+
+        // ==> Syntactic descomposition
+        if(incrementor != null){
+            body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(incrementor)));
+        }
+        if(condition == null){
+            condition = new Expr.Literal(true);
+        }
+        body = new Stmt.While(condition, body);
+        if(initializer != null){
+            body = new Stmt.Block(Arrays.asList(initializer, body));
+        }
+        // <== Syntactic descomposition
+        return body;
+    }
+
+    private Stmt whileStatement() { // whileStmnt -> "while" "(" expression ")" stmt
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        Stmt body = statement();
+        return new Stmt.While(condition, body);
     }
     
     private Stmt ifStatement() { // ifStmnt -> "if" "(" expression ")" stmt ("else" stmt)?

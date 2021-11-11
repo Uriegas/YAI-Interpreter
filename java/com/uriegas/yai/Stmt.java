@@ -14,7 +14,7 @@ abstract class Stmt {
         R visitPrintStmt(Print stmt);
         // R visitReturnStmt(Return stmt);
         R visitVarStmt(Var stmt);
-        // R visitWhileStmt(While stmt);
+        R visitWhileStmt(While stmt);
     }
 
     static class Block extends Stmt {
@@ -107,19 +107,19 @@ abstract class Stmt {
         }
     }
     
-    // static class While extends Stmt {
-    //     final Expr condition;
-    //     final Stmt body;
-    //     While(Expr condition, Stmt body) {
-    //         this.condition = condition;
-    //         this.body = body;
-    //     }
+    static class While extends Stmt {
+        final Expr condition;
+        final Stmt body;
+        While(Expr condition, Stmt body) {
+            this.condition = condition;
+            this.body = body;
+        }
 
-    //     @Override
-    //     <R> R accept(Visitor<R> visitor) {
-    //         return visitor.visitWhileStmt(this);
-    //     }
-    // }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitWhileStmt(this);
+        }
+    }
 
     abstract <R> R accept(Visitor<R> visitor);
 }
