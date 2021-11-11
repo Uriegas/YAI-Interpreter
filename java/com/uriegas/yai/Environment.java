@@ -27,8 +27,14 @@ public class Environment {
     }
 
     public void assign(Token name, Object value) {
-        if(values.containsKey(name.lexeme))
+        if(values.containsKey(name.lexeme)){
             values.put(name.lexeme, value);
+            return;
+        }
+        if(enclosing != null){
+            enclosing.assign(name, value);
+            return;
+        }
         else //Variable not found
             throw new RuntimeException("Variable " + name.lexeme + " not found");
     }
