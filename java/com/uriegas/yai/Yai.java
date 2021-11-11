@@ -78,6 +78,11 @@ public class Yai{
         report(line, "", message);
     }
 
+    /**
+     * Reports an error with token information.
+     * @param token
+     * @param message
+     */
     static void error(Token token, String message) {
         if (token.type == TokenType.EOF)
             report(token.line, " at end", message);
@@ -85,6 +90,10 @@ public class Yai{
             report(token.line, " at '" + token.lexeme + "'", message);
     }
 
+    /**
+     * Reports an runtime error.
+     * @param error
+     */
     static void runtimeError(RuntimeError error) {
         System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
         hadRuntimeError = true;
@@ -100,14 +109,4 @@ public class Yai{
         System.err.println("[line " + line + "] Error" + where + ": " + message);
         hadError = true;
     }
-    // static void error(Token token, String message) {
-    //     if (token.type == TokenType.EOF)
-    //         report(token.line, " at end", message);
-    //     else
-    //         report(token.line, " at '" + token.lexeme + "'", message);
-    // }
-    // static void runtimeError(RuntimeError error) {
-    //     System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
-    //     hadRuntimeError = true;
-    // }
 }
