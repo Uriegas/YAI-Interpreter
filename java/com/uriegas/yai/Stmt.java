@@ -7,7 +7,7 @@ import java.util.List;
  */
 abstract class Stmt {
     interface Visitor<R> {
-        // R visitBlockStmt(Block stmt);
+        R visitBlockStmt(Block stmt);
         R visitExpressionStmt(Expression stmt);
         // R visitFunctionStmt(Function stmt);
         // R visitIfStmt(If stmt);
@@ -17,16 +17,16 @@ abstract class Stmt {
         // R visitWhileStmt(While stmt);
     }
 
-    // static class Block extends Stmt {
-    //     final List<Stmt> statements;
-    //     Block(List<Stmt> statements) {
-    //     this.statements = statements;
-    //     }
-    //     @Override
-    //     <R> R accept(Visitor<R> visitor) {
-    //     return visitor.visitBlockStmt(this);
-    //     }
-    // }
+    static class Block extends Stmt {
+        final List<Stmt> statements;
+        Block(List<Stmt> statements) {
+        this.statements = statements;
+        }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+        return visitor.visitBlockStmt(this);
+        }
+    }
 
     static class Expression extends Stmt {
         final Expr expression;
