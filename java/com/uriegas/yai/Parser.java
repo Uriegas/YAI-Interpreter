@@ -241,13 +241,38 @@ public class Parser {
         return expr;
     }
 
-    private Expr unary() { // unary -> ( "!" | "-" ) unary | primary
+    private Expr unary() { // unary -> ( "!" | "-" ) unary | call
         if (match(BANG, MINUS)) {
             Token operator = previous();
             Expr right = unary();
             return new Expr.Unary(operator, right);
         }
-        return primary();
+        return call();
+    }
+
+    private Expr finishCall(Expr callee) { // Helper function for the call function
+        List<Expr> arguments = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (arguments.size() >= 255) {
+                    error(peek(), "Cannot have more than 255 arguments.");
+                }
+                arguments.add(expression());
+            } while (match(COMMA));
+        }
+        Token paren = consume(RIGHT_PAREN, "Expect ')' after arguments.");
+        return new Expr.Call(callee, paren, arguments);
+    }
+
+    private Expr call() { // call -> primary ( "(" arguments? ")" )*
+        Expr expr = primary();
+        while (true) {
+            if (match(LEFT_PAREN))
+                expr = finishCall(expr);
+            else
+                break;
+        }
+        return expr;
     }
 
     private Expr primary() { // primary -> NUMBER | STRING | IDENTIFIER | "false" | "true" | "null" | "(" expression ")"

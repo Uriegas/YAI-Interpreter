@@ -76,6 +76,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Object visitCallExpr(Expr.Call expr) {
+        Object callee = evaluate(expr.callee);//Should be an IDENTIFIER
+        List<Object> arguments = new ArrayList<>();
+
+        for (Expr argument : expr.arguments) {
+            arguments.add(evaluate(argument));
+        }
+        if (!(callee instanceof YaiCallable))
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+
+        YaiCallable function = (YaiCallable) callee;
+
+        if (arguments.size() != function.arity())
+            throw new RuntimeError(expr.paren, "Expected " + function.arity() + " arguments but got " + arguments.size() + ".");
+
+        return function.call(this, arguments);
+    }
+
+    @Override
     public Object visitVariableExpr(Expr.Variable expr) {
         return environment.get(expr.name);
     }
